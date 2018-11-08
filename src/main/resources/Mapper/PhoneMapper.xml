@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.pachira.pachiracontent.dao.PhoneDAO">
+    <!-- 需要的返回信息 -->
+    <sql id="BaseSql">
+		pref,phone,province,city,isp,post_code,city_code,area_code,types
+	</sql>
+
+    <!-- 返回结果的映射 -->
+    <resultMap type="cn.pachira.pachiracontent.entity.Phone" id="BaseResultMap">
+        <result property="pref" column="pref"/>
+        <result property="phone" column="phone"/>
+        <result property="province" column="province"/>
+        <result property="city" column="city"/>
+        <result property="isp" column="isp"/>
+        <result property="postCode" column="post_code"/>
+        <result property="cityCode" column="city_code"/>
+        <result property="areaCode" column="area_code"/>
+        <result property="types" column="types"/>
+    </resultMap>
+
+    <!-- 手机单条归属地记录查询 -->
+    <select id="getMobileLocalInfo" parameterType="java.lang.String"
+            resultMap="BaseResultMap">
+        select
+        <include refid="BaseSql"/>
+        from phone
+        where phone = #{phone,jdbcType=VARCHAR}
+    </select>
+
+    <!-- 多条查询 -->
+    <select id="getMultipleMobileLocalInfo" parameterType="java.util.List"
+            resultMap="BaseResultMap">
+        select
+        <include refid="BaseSql"/>
+        from phone
+        where phone in
+        <if test="phones != null and !phones.isEmpty()">
+            <foreach collection="phones" item="phone" index="index"
+                     open="(" close=")" separator=",">
+                #{phone}
+            </foreach>
+        </if>
+        <if test="phones == null or  phones.isEmpty()">
+            ('0000000')
+        </if>
+    </select>
+</mapper>

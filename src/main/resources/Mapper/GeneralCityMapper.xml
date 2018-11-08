@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.pachira.pachiracontent.dao.GeneralCityDAO">
+    <sql id="BaseSql">
+        city_code,city,superior_code,short_name,level,area_code,post_code,spell
+    </sql>
+    <resultMap type="cn.pachira.pachiracontent.entity.GeneralCity" id="BaseResultMap">
+        <result property="cityCode" column="city_code"/>
+        <result property="city" column="city"/>
+        <result property="superiorCode" column="superior_code"/>
+        <result property="shortName" column="short_name"/>
+        <result property="level" column="level"/>
+        <result property="areaCode" column="area_code"/>
+        <result property="postCode" column="post_code"/>
+        <result property="spell" column="spell"/>
+    </resultMap>
+
+    <select id="getCityByCityCode" parameterType="java.lang.String"
+            resultMap="BaseResultMap">
+        select
+        <include refid="BaseSql"/>
+        from generalcitys
+        where city_code = #{cityCode,jdbcType=VARCHAR}
+    </select>
+
+
+    <!-- 单个区号查询 -->
+    <select id="getCitiesByAreaCode" parameterType="java.lang.String"
+            resultMap="BaseResultMap">
+        select
+        <include refid="BaseSql"/>
+        from generalcitys
+        where area_code = #{areaCode,jdbcType=VARCHAR} and level='2'
+    </select>
+
+    <!-- 多区号查询 -->
+    <select id="getCitiesByAreaCodes" parameterType="java.util.List"
+            resultMap="BaseResultMap">
+        select
+        <include refid="BaseSql"/>
+        from generalcitys
+        where level='2' and
+        area_code in
+        <if test="areaCodes != null and !areaCodes.isEmpty()">
+            <foreach collection="areaCodes" item="areaCode" index="index"
+                     open="(" close=")" separator=",">
+                #{areaCode}
+            </foreach>
+        </if>
+        <if test="areaCodes == null or  areaCodes.isEmpty()">
+            ('000')
+        </if>
+    </select>
+</mapper>
